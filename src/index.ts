@@ -20,7 +20,8 @@ fastify.register(import('@fastify/swagger'), {
     produces: ['application/json'],
     tags: [
       { name: 'Authentication', description: 'Authentication endpoints' },
-      { name: 'API', description: 'ClinicaOn API wrapper endpoints' }
+      { name: 'Agenda', description: 'Agenda and appointment endpoints' },
+      { name: 'Relatorios', description: 'Reports and analytics endpoints' }
     ]
   }
 });
@@ -40,6 +41,7 @@ fastify.decorate('clinicaOnClient', clinicaOnClient);
 // Register routes
 fastify.register(import('./routes/auth'), { prefix: '/api' });
 fastify.register(import('./routes/agenda'), { prefix: '/api' });
+fastify.register(import('./routes/relatorios'), { prefix: '/api' });
 
 // Health check endpoint
 fastify.get('/', {

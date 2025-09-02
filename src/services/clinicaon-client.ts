@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import jwt from 'jsonwebtoken';
 import { LoginRequest, LoginResponse, JWTPayload } from '../types/auth';
 import { AgendaPayload, AgendaItemRaw, AgendaItem } from '../types/agenda';
+import { AniversariantesRequest, AniversarianteItem } from '../types/relatorios';
 
 export class ClinicaOnClient {
   private client: AxiosInstance;
@@ -116,5 +117,22 @@ export class ClinicaOnClient {
     }
 
     return filteredData;
+  }
+
+  async getAniversariantes(dataDe: string, dataAte: string, situacaoId: string = ''): Promise<AniversarianteItem[]> {
+    const requestData: AniversariantesRequest = {
+      nomeRelatorio: 'aniversariantes',
+      dataDe,
+      dataAte,
+      situacaoId
+    };
+
+    const response = await this.makeRequest<AniversarianteItem[]>(
+      'POST',
+      '/api/relatorios/cadastros',
+      requestData
+    );
+
+    return response;
   }
 }
