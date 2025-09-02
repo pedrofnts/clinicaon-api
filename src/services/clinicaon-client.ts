@@ -119,11 +119,11 @@ export class ClinicaOnClient {
     return filteredData;
   }
 
-  async getAniversariantes(dataDe: string, dataAte: string, situacaoId: string = ''): Promise<AniversarianteItem[]> {
+  async getAniversariantes(startDate: string, endDate: string, situacaoId: string = ''): Promise<AniversarianteItem[]> {
     const requestData: AniversariantesRequest = {
       nomeRelatorio: 'aniversariantes',
-      dataDe,
-      dataAte,
+      dataDe: startDate,
+      dataAte: endDate,
       situacaoId
     };
 

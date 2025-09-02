@@ -10,14 +10,14 @@ export default async function relatoriosRoutes(fastify: FastifyInstance, options
       tags: ['Relatorios'],
       querystring: {
         type: 'object',
-        required: ['dataDe', 'dataAte'],
+        required: ['startDate', 'endDate'],
         properties: {
-          dataDe: { 
+          startDate: { 
             type: 'string', 
             format: 'date',
             description: 'Start date in YYYY-MM-DD format (e.g., 2025-09-01)'
           },
-          dataAte: { 
+          endDate: { 
             type: 'string', 
             format: 'date',
             description: 'End date in YYYY-MM-DD format (e.g., 2025-09-30)'
@@ -54,8 +54,8 @@ export default async function relatoriosRoutes(fastify: FastifyInstance, options
             periodo: {
               type: 'object',
               properties: {
-                dataDe: { type: 'string' },
-                dataAte: { type: 'string' }
+                startDate: { type: 'string' },
+                endDate: { type: 'string' }
               }
             }
           }
@@ -70,22 +70,22 @@ export default async function relatoriosRoutes(fastify: FastifyInstance, options
       }
     }
   }, async (request, reply) => {
-    const { dataDe, dataAte, situacaoId = '' } = request.query as {
-      dataDe: string;
-      dataAte: string;
+    const { startDate, endDate, situacaoId = '' } = request.query as {
+      startDate: string;
+      endDate: string;
       situacaoId?: string;
     };
 
     try {
-      const aniversariantes = await fastify.clinicaOnClient.getAniversariantes(dataDe, dataAte, situacaoId);
+      const aniversariantes = await fastify.clinicaOnClient.getAniversariantes(startDate, endDate, situacaoId);
       
       reply.send({
         success: true,
         data: aniversariantes,
         count: aniversariantes.length,
         periodo: {
-          dataDe,
-          dataAte
+          startDate,
+          endDate
         }
       });
     } catch (error: any) {
