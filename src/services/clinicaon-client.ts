@@ -8,6 +8,8 @@ export class ClinicaOnClient {
   private client: AxiosInstance;
   private accessToken: string | null = null;
   private tokenExpiry: number | null = null;
+  private storedEmail: string | null = null;
+  private storedPassword: string | null = null;
 
   constructor(private baseURL: string = 'https://api.clinicaon.com.br') {
     this.client = axios.create({
@@ -41,6 +43,8 @@ export class ClinicaOnClient {
     
     if (response.data.sucesso && response.data.access_token) {
       this.accessToken = response.data.access_token;
+      this.storedEmail = email;
+      this.storedPassword = password;
       
       // Decode JWT to get expiry
       const decoded = jwt.decode(response.data.access_token) as JWTPayload;
@@ -65,7 +69,15 @@ export class ClinicaOnClient {
 
   async makeRequest<T>(method: 'GET' | 'POST', endpoint: string, data?: any, params?: any): Promise<T> {
     if (!this.isTokenValid()) {
-      throw new Error('No valid token available. Please login first.');
+      if (this.storedEmail && this.storedPassword) {
+        try {
+          await this.login(this.storedEmail, this.storedPassword);
+        } catch (error) {
+          throw new Error('Auto-login failed. Please login manually.');
+        }
+      } else {
+        throw new Error('No valid token available. Please login first.');
+      }
     }
 
     const response = await this.client.request<T>({
