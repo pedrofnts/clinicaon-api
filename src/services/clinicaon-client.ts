@@ -107,16 +107,23 @@ export class ClinicaOnClient {
     );
 
     // Transform raw data to clean format
-    let filteredData = rawData.map(item => ({
-      id: item.Id,
-      horaInicio: item.HoraInicio,
-      horaFim: item.HoraFim,
-      nomePessoa: item.NomePessoa,
-      telefone: item.Telefone,
-      celular: item.Celular,
-      servicos: item.Servicos ? item.Servicos.split(',').map(s => s.trim()) : [],
-      status: item.NomeStatus
-    }));
+    let filteredData = rawData.map(item => {
+      // Extract date from StartTime (format: yyyy-MM-dd)
+      const startDate = new Date(item.StartTime);
+      const data = startDate.toISOString().split('T')[0];
+
+      return {
+        id: item.Id,
+        data,
+        horaInicio: item.HoraInicio,
+        horaFim: item.HoraFim,
+        nomePessoa: item.NomePessoa,
+        telefone: item.Telefone,
+        celular: item.Celular,
+        servicos: item.Servicos ? item.Servicos.split(',').map(s => s.trim()) : [],
+        status: item.NomeStatus
+      };
+    });
 
     // Apply status filtering if provided
     if (statusFilter) {

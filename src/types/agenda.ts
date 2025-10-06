@@ -43,6 +43,7 @@ export interface AgendaItemRaw {
 
 export interface AgendaItem {
   id: number;
+  data: string;
   horaInicio: string;
   horaFim: string;
   nomePessoa: string;

@@ -12,18 +12,20 @@ export default async function agendaRoutes(fastify: FastifyInstance, options: Fa
         type: 'object',
         required: ['startDate', 'endDate'],
         properties: {
-          startDate: { 
-            type: 'string', 
-            format: 'date-time',
-            description: 'Start date in ISO format (e.g., 2025-09-03T03:00:00.000Z)'
+          startDate: {
+            type: 'string',
+            format: 'date',
+            description: 'Start date (e.g., 2025-09-03)',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}$'
           },
-          endDate: { 
-            type: 'string', 
-            format: 'date-time',
-            description: 'End date in ISO format (e.g., 2025-09-04T03:00:00.000Z)'
+          endDate: {
+            type: 'string',
+            format: 'date',
+            description: 'End date (e.g., 2025-09-04)',
+            pattern: '^\\d{4}-\\d{2}-\\d{2}$'
           },
-          semFalta: { 
-            type: 'boolean', 
+          semFalta: {
+            type: 'boolean',
             default: false,
             description: 'Whether to exclude no-shows'
           },
@@ -44,13 +46,14 @@ export default async function agendaRoutes(fastify: FastifyInstance, options: Fa
                 type: 'object',
                 properties: {
                   id: { type: 'number', description: 'Appointment ID' },
+                  data: { type: 'string', format: 'date', description: 'Appointment date (yyyy-MM-dd)' },
                   horaInicio: { type: 'string', description: 'Start time (HH:mm)' },
                   horaFim: { type: 'string', description: 'End time (HH:mm)' },
                   nomePessoa: { type: 'string', description: 'Patient name' },
                   telefone: { type: ['string', 'null'], description: 'Phone number' },
                   celular: { type: 'string', description: 'Mobile number' },
-                  servicos: { 
-                    type: 'array', 
+                  servicos: {
+                    type: 'array',
                     items: { type: 'string' },
                     description: 'List of services'
                   },
@@ -79,8 +82,12 @@ export default async function agendaRoutes(fastify: FastifyInstance, options: Fa
     };
 
     try {
-      const agenda = await fastify.clinicaOnClient.getAgenda(startDate, endDate, semFalta, status);
-      
+      // Convert yyyy-MM-dd to ISO format for external API
+      const startDateISO = `${startDate}T03:00:00.000Z`;
+      const endDateISO = `${endDate}T03:00:00.000Z`;
+
+      const agenda = await fastify.clinicaOnClient.getAgenda(startDateISO, endDateISO, semFalta, status);
+
       reply.send({
         success: true,
         data: agenda,
@@ -131,24 +138,25 @@ export default async function agendaRoutes(fastify: FastifyInstance, options: Fa
           type: 'object',
           properties: {
             success: { type: 'boolean' },
-            date: { type: 'string' },
+            date: { type: 'string', format: 'date', description: 'Query date' },
             data: {
               type: 'array',
               items: {
                 type: 'object',
                 properties: {
-                  id: { type: 'number' },
-                  horaInicio: { type: 'string' },
-                  horaFim: { type: 'string' },
-                  nomePessoa: { type: 'string' },
-                  telefone: { type: ['string', 'null'] },
-                  celular: { type: 'string' },
-                  servicos: { type: 'array', items: { type: 'string' } },
-                  status: { type: 'string' }
+                  id: { type: 'number', description: 'Appointment ID' },
+                  data: { type: 'string', format: 'date', description: 'Appointment date (yyyy-MM-dd)' },
+                  horaInicio: { type: 'string', description: 'Start time (HH:mm)' },
+                  horaFim: { type: 'string', description: 'End time (HH:mm)' },
+                  nomePessoa: { type: 'string', description: 'Patient name' },
+                  telefone: { type: ['string', 'null'], description: 'Phone number' },
+                  celular: { type: 'string', description: 'Mobile number' },
+                  servicos: { type: 'array', items: { type: 'string' }, description: 'List of services' },
+                  status: { type: 'string', description: 'Appointment status' }
                 }
               }
             },
-            count: { type: 'number' }
+            count: { type: 'number', description: 'Total number of appointments' }
           }
         }
       }
